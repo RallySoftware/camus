@@ -27,16 +27,19 @@
         <groupId>com.linkedin.camus</groupId>
         <artifactId>camus-api</artifactId>
         <version>0.1.0-SNAPSHOT</version>
+        <classifier>${hadoop.version}</classifier>
       </dependency>
       <dependency>
         <groupId>com.linkedin.camus</groupId>
         <artifactId>camus-etl-kafka</artifactId>
         <version>0.1.0-SNAPSHOT</version>
+        <classifier>${hadoop.version}</classifier>
       </dependency>
       <dependency>
         <groupId>com.linkedin.camus</groupId>
         <artifactId>camus-schema-registry</artifactId>
         <version>0.1.0-SNAPSHOT</version>
+        <classifier>${hadoop.version}</classifier>
       </dependency>
       <dependency>
         <groupId>com.linkedin.camus</groupId>
@@ -73,7 +76,7 @@
       <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-core</artifactId>
-        <version>1.0.3</version>
+        <version>${hadoop.version}</version>
       </dependency>
       <dependency>
         <groupId>kafka</groupId>
@@ -103,7 +106,7 @@
     <module>camus-etl-kafka</module>
     <module>camus-schema-registry</module>
     <module>camus-schema-registry-avro</module>
-    <module>camus-example</module>
+    <!--<module>camus-example</module>-->
   </modules>
 
   <licenses>
@@ -145,6 +148,9 @@
             </goals>
           </execution>
         </executions>
+          <configuration>
+              <classifier>${hadoop.version}</classifier>
+          </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-install-plugin</artifactId>

@@ -11,14 +11,17 @@
   <artifactId>camus-etl-kafka</artifactId>
   <name>Camus ETL to move data from Kafka to Hadoop.</name>
   <packaging>jar</packaging>
+
   <dependencies>
     <dependency>
       <groupId>com.linkedin.camus</groupId>
       <artifactId>camus-api</artifactId>
+      <classifier>${hadoop.version}</classifier>
     </dependency>
     <dependency>
       <groupId>com.linkedin.camus</groupId>
       <artifactId>camus-schema-registry</artifactId>
+      <classifier>${hadoop.version}</classifier>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

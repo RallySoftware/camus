@@ -63,7 +63,7 @@ Once the hadoop job has completed, the main client reads all the written audit c
 
 You can build Camus with:
 
-    mvn clean package
+    mvn clean install -Dhadoop.version=<your hadoop version>
 
 Note that there are two jars that are not currently in a public Maven repo. These jars (kafka-0.7.2 and avro-schema-repository-1.74-SNAPSHOT) are supplied in the lib directory, and maven will automatically install them into your local Maven cache (usually ~/.m2).
 

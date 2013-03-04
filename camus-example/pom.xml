@@ -2,36 +2,18 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.linkedin.camus</groupId>
-    <artifactId>camus-parent</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-  </parent>
-
   <artifactId>camus-example</artifactId>
   <name>Camus Examples</name>
   <packaging>jar</packaging>
+  <groupId>com.linkedin.camus</groupId>
+  <version>0.0.1-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
       <groupId>com.linkedin.camus</groupId>
-      <artifactId>camus-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.linkedin.camus</groupId>
-      <artifactId>camus-schema-registry</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.linkedin.camus</groupId>
       <artifactId>camus-etl-kafka</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.avro</groupId>
-      <artifactId>avro</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-core</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <classifier>${hadoop.version}</classifier>
     </dependency>
   </dependencies>
 
