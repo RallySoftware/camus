@@ -137,6 +137,20 @@
     </repository>
   </repositories>
 
+<distributionManagement>
+    <repository>
+        <id>releases</id>
+        <name>releases</name>
+        <url>http://alm-build:8080/nexus/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+        <id>snapshots</id>
+        <name>snapshots</name>
+        <url>http://alm-build:8080/nexus/content/repositories/snapshots</url>
+        <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+</distributionManagement>
+
   <build>
     <plugins>
       <plugin>
