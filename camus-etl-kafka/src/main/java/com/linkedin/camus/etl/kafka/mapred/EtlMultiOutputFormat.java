@@ -26,6 +26,7 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -41,6 +42,7 @@ import com.linkedin.camus.etl.kafka.common.ExceptionWritable;
  */
 
 public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
+    private static final Logger logger = Logger.getLogger(EtlMultiOutputFormat.class);
     public static final String ETL_DESTINATION_PATH = "etl.destination.path";
     public static final String ETL_DESTINATION_PATH_TOPIC_SUBDIRECTORY = "etl.destination.path.topic.sub.dir";
     public static final String ETL_RUN_MOVE_DATA = "etl.run.move.data";
@@ -95,6 +97,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
 
         Path path = committer.getWorkPath();
         path = new Path(path, getUniqueFile(context, name, EXT));
+        logger.info("Creating datafile: " + path);
         writer.create(Schema.parse(schema),
                 path.getFileSystem(context.getConfiguration()).create(path));
 
@@ -351,6 +354,7 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
                                 fs.mkdirs(dest.getParent());
                             }
 
+                        logger.info("Renaming path: " + f.getPath() + " to " + dest);
                         fs.rename(f.getPath(), dest);
 
                         if (isRunTrackingPost(context)) {
