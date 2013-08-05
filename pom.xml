@@ -132,6 +132,20 @@
     </repository>
   </repositories>
 
+<distributionManagement>
+    <repository>
+        <id>releases</id>
+        <name>releases</name>
+        <url>http://alm-build:8080/nexus/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+        <id>snapshots</id>
+        <name>snapshots</name>
+        <url>http://alm-build:8080/nexus/content/repositories/snapshots</url>
+        <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+</distributionManagement>
+
   <build>
     <plugins>
       <plugin>
@@ -180,6 +194,9 @@
               <file>${basedir}/lib/avro-repo-bundle-1.7.4-SNAPSHOT-withdeps.jar</file>
               <pomFile>${basedir}/lib/avro-repo-bundle-1.7.4-SNAPSHOT-withdeps.xml</pomFile>
             </configuration>
+              <!-- To deploy this artifact, copy the above jar out of the ~/.m2/repo.. and run the following:
+              mvn deploy:deploy-file -DgroupId=org.apache.avro -DartifactId=avro-repo-bundle -Dversion=1.7.4-SNAPSHOT -Dpackaging=jar -Dfile=avro-repo-bundle-1.7.4-SNAPSHOT.jar -Durl=http://alm-build:8080/nexus/content/repositories/snapshots -DrepositoryId=Nexus
+              -->
           </execution>
         </executions>
       </plugin>
