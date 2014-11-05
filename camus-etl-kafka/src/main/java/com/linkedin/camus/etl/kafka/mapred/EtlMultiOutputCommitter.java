@@ -1,8 +1,6 @@
 package com.linkedin.camus.etl.kafka.mapred;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,6 +132,15 @@ public class EtlMultiOutputCommitter extends FileOutputCommitter {
             offsetWriter.append(offsets.get(s), NullWritable.get());
         }
         offsetWriter.close();
+
+        // TODO Pull this into a strategy
+        Path plainTextOffsetPath = new Path(super.getWorkPath(), EtlMultiOutputFormat.getUniqueFile(context, "plaintext-" + EtlMultiOutputFormat.OFFSET_PREFIX, ".txt"));
+        BufferedWriter plainTextOffsetWriter = new BufferedWriter(new OutputStreamWriter(fs.create(plainTextOffsetPath, true)));
+        for (String s : offsets.keySet()) {
+            plainTextOffsetWriter.write(offsets.get(s).toString() + "\n");
+        }
+        plainTextOffsetWriter.close();
+
         super.commitTask(context);
     }
     
