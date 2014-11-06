@@ -53,5 +53,3 @@ set-version $VERSION-cdh4
 mvn -Dhadoop-client.version=2.0.0-mr1-cdh4.2.0 -DaltDeploymentRepository=internal.repo::default::file://$(pwd)/target/mvn-repo clean deploy
 find . -name "pom.xml" | xargs git checkout 
 
-# Upload mvn-repo to s3
-aws s3 sync target/mvn-repo s3://rally-maven-public/ 
