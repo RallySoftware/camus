@@ -19,7 +19,7 @@ VERSION=0.1.1
 #  </repositories> 
 
 function set-version() {
-	VERSION=$1
+	local VERSION=$1
 	xmlstarlet edit -L -N x="http://maven.apache.org/POM/4.0.0" -u "//x:project/x:version" -v "$VERSION"  pom.xml
 	xmlstarlet edit -L -N x="http://maven.apache.org/POM/4.0.0" -u "//x:project/x:properties/x:project.version" -v "$VERSION"  pom.xml
 	find . -name "pom.xml" | xargs -P1 xmlstarlet edit -L -N x="http://maven.apache.org/POM/4.0.0" -u "//x:project/x:parent/x:version" -v "$VERSION" 
