@@ -52,4 +52,4 @@ mvn -Dhadoop-client.version=2.0.0-mr1-cdh4.2.0 -DaltDeploymentRepository=interna
 find . -name "pom.xml" | xargs git checkout 
 
 # Upload mvn-repo to s3
-aws --profile schwartz-ci s3 sync target/mvn-repo s3://rally-maven-public/ 
+aws s3 sync target/mvn-repo s3://rally-maven-public/ 
