@@ -42,7 +42,7 @@ mvn deploy:deploy-file -DgroupId=org.apache.avro -DartifactId=avro-repo-bundle -
 # --- Build Hadoop 1 ---
 # update pom files
 set-version 0.1.0-hadoop1
-mvn -DaltDeploymentRepository=internal.repo::default::file://$(pwd)/mvn-repo clean deploy
+mvn -DaltDeploymentRepository=internal.repo::default::file://$(pwd)/target/mvn-repo clean deploy
 find . -name "pom.xml" | xargs git checkout 
 
 # --- Build Cloudera ---
