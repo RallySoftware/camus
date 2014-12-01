@@ -1,11 +1,11 @@
 package com.linkedin.camus.etl.kafka.mapred;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.linkedin.camus.etl.Partitioner;
+import com.linkedin.camus.etl.RecordWriterProvider;
+import com.linkedin.camus.etl.kafka.common.AvroRecordWriterProvider;
+import com.linkedin.camus.etl.kafka.common.DateUtils;
+import com.linkedin.camus.etl.kafka.common.EtlKey;
+import com.linkedin.camus.etl.kafka.partitioner.DefaultPartitioner;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.OutputCommitter;
@@ -16,16 +16,15 @@ import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 
-import com.linkedin.camus.etl.Partitioner;
-import com.linkedin.camus.etl.RecordWriterProvider;
-import com.linkedin.camus.etl.kafka.common.AvroRecordWriterProvider;
-import com.linkedin.camus.etl.kafka.common.DateUtils;
-import com.linkedin.camus.etl.kafka.common.EtlKey;
-import com.linkedin.camus.etl.kafka.partitioner.DefaultPartitioner;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * MultipleAvroOutputFormat.
- *
+ * <p/>
  * File names are determined by output keys.
  */
 
@@ -61,16 +60,18 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     @Override
     public RecordWriter<EtlKey, Object> getRecordWriter(TaskAttemptContext context)
             throws IOException, InterruptedException {
-        if (committer == null)
-            committer = new EtlMultiOutputCommitter(getOutputPath(context), context, log);
+        if (committer == null) {
+            committer = new EtlMultiOutputCommitter(getOutputPath(context), context, log, partitionersByTopic);
+        }
         return new EtlMultiOutputRecordWriter(context, committer);
     }
 
     @Override
     public synchronized OutputCommitter getOutputCommitter(TaskAttemptContext context)
             throws IOException {
-        if (committer == null)
-            committer = new EtlMultiOutputCommitter(getOutputPath(context), context, log);
+        if (committer == null) {
+            committer = new EtlMultiOutputCommitter(getOutputPath(context), context, log, partitionersByTopic);
+        }
         return committer;
     }
 
@@ -84,17 +85,14 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
                 .getClass(ETL_RECORD_WRITER_PROVIDER_CLASS,
                         AvroRecordWriterProvider.class);
     }
-    
+
     public static RecordWriterProvider getRecordWriterProvider(JobContext job) {
-        try
-        {
-          return (RecordWriterProvider) job.getConfiguration()
-                   .getClass(ETL_RECORD_WRITER_PROVIDER_CLASS,
-                           AvroRecordWriterProvider.class).newInstance();
-        }
-        catch (Exception e)
-        {
-          throw new RuntimeException(e);
+        try {
+            return (RecordWriterProvider) job.getConfiguration()
+                    .getClass(ETL_RECORD_WRITER_PROVIDER_CLASS,
+                            AvroRecordWriterProvider.class).newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -131,9 +129,9 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     }
 
     public static long getMonitorTimeGranularityMs(JobContext job) {
-      return job.getConfiguration().getInt(KAFKA_MONITOR_TIME_GRANULARITY_MS, 10) * 60000L;
+        return job.getConfiguration().getInt(KAFKA_MONITOR_TIME_GRANULARITY_MS, 10) * 60000L;
     }
-    
+
     public static void setEtlAvroWriterSyncInterval(JobContext job, int val) {
         job.getConfiguration().setInt(ETL_AVRO_WRITER_SYNC_INTERVAL, val);
     }
@@ -186,26 +184,26 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
         Partitioner partitioner = getPartitioner(context, key.getTopic());
         return partitioner.getWorkingFileName(context, key.getTopic(), key.getLeaderId(), key.getPartition(), partitioner.encodePartition(context, key));
     }
-    
+
     public static void setDefaultPartitioner(JobContext job, Class<?> cls) {
-      job.getConfiguration().setClass(ETL_DEFAULT_PARTITIONER_CLASS, cls, Partitioner.class);
+        job.getConfiguration().setClass(ETL_DEFAULT_PARTITIONER_CLASS, cls, Partitioner.class);
     }
-    
-    public static Partitioner getDefaultPartitioner(JobContext job) {
-        return ReflectionUtils.newInstance(job.getConfiguration().getClass(ETL_DEFAULT_PARTITIONER_CLASS, DefaultPartitioner.class, Partitioner.class), job.getConfiguration());
-    }    
+
+    public static Class<? extends com.linkedin.camus.etl.Partitioner>  getDefaultPartitioner(JobContext job) {
+        return job.getConfiguration().getClass(ETL_DEFAULT_PARTITIONER_CLASS, DefaultPartitioner.class, Partitioner.class);
+    }
 
     public static Partitioner getPartitioner(JobContext job, String topicName) throws IOException {
-        String customPartitionerProperty = ETL_DEFAULT_PARTITIONER_CLASS + "." + topicName;
-        if(partitionersByTopic.get(customPartitionerProperty) == null) {
-            List<Partitioner> partitioners = new ArrayList<Partitioner>();
-            if(partitioners.isEmpty()) {
-                return getDefaultPartitioner(job);
-            } else {
-                partitionersByTopic.put(customPartitionerProperty, partitioners.get(0));
-            }
+
+        if (partitionersByTopic.get(topicName) == null) {
+            String customPartitionerProperty = ETL_DEFAULT_PARTITIONER_CLASS + "." + topicName;
+            Class<? extends Partitioner> partitionerClass = getDefaultPartitioner(job);
+            partitionerClass = job.getConfiguration().getClass(customPartitionerProperty, partitionerClass, Partitioner.class );
+
+            Partitioner p = ReflectionUtils.newInstance(partitionerClass, job.getConfiguration());
+            partitionersByTopic.put(topicName,p);
         }
-        return partitionersByTopic.get(customPartitionerProperty);
+        return partitionersByTopic.get(topicName);
     }
 
     public static void resetPartitioners() {

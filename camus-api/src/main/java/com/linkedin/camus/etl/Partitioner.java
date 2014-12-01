@@ -3,7 +3,11 @@ package com.linkedin.camus.etl;
 
 
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+
+import java.io.IOException;
 
 public abstract class Partitioner extends Configured {
     /**
@@ -68,5 +72,13 @@ public abstract class Partitioner extends Configured {
     public abstract String getWorkingFileName(JobContext context, String topic, String brokerId, 
         int partitionId, String encodedPartition);
 
-       
+    /**
+     * Do something interesting with the partitions that this partitioner has processed.
+     * e.g. Create entries in a hive metadata store for partitions processed in this run.
+     *
+     * This method will be called at commit phase of the map task.
+     * @param context
+     * @param workPath
+     */
+    public void recordProcessedPartitions(TaskAttemptContext context, Path workPath) throws IOException {};
 }
