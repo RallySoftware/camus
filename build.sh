@@ -3,6 +3,20 @@ set -e
 
 VERSION=0.1.1
 
+while [ "$#" -gt 0 ]; do
+  case "$1" in 
+  -f) 
+     OVERWRITE_POM=1
+     shift
+     ;;
+  *) 
+     echo "Unknown option $1"
+     exit 1
+     ;;
+  esac
+done
+
+
 # Must add the following to repo to the default profile in .m2/settings.xml
 # <repositories>
 #    <repository>
@@ -31,8 +45,11 @@ which xmlstarlet > /dev/null || {
 }
 
 if git status | grep pom.xml > /dev/null; then 
-  echo "This script modifies pom.xml files.  Please commit, stash, or revert any changes"
-  exit 3;
+  if [ -z "$OVERWRITE_POM" ]; then 
+    echo "This script modifies pom.xml files.  Please commit, stash, or revert any changes"
+    exit 3;
+  fi
+  find . -name "pom.xml" | xargs git checkout 
 fi
 
 # Clean
