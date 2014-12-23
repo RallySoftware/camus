@@ -71,8 +71,8 @@ public class EtlMultiOutputCommitter extends FileOutputCommitter {
         for (String hook : context.getConfiguration().getStringCollection(ETL_COMMIT_HOOKS)) {
             log.info("Adding commit hook: " + hook);
             Class<CommitHook> klass = (Class<CommitHook>) Class.forName(hook);
-            Constructor<CommitHook> constructor = klass.getConstructor(TaskAttemptContext.class, Path.class, Path.class, Logger.class);
-            CommitHook commitHook = constructor.newInstance(context, workPath, outputPath, log);
+            Constructor<CommitHook> constructor = klass.getConstructor(TaskAttemptContext.class, Path.class, Path.class);
+            CommitHook commitHook = constructor.newInstance(context, workPath, outputPath);
             commitHooks.add(commitHook);
         }
 
