@@ -15,7 +15,6 @@ import java.util.Properties;
 import java.util.Random;
 
 import com.linkedin.camus.etl.kafka.coders.FailDecoder;
-import com.linkedin.camus.etl.kafka.mapred.EtlMultiOutputCommitter;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -107,7 +106,7 @@ public class CamusJobTest {
         props.setProperty(CamusJob.KAFKA_CLIENT_NAME, "Camus");
         
         props.setProperty(CamusJob.KAFKA_BROKERS, props.getProperty("metadata.broker.list"));
-
+        
         // Run Map/Reduce tests in process.
         //props.setProperty("mapreduce.framework.name", "local");
         props.setProperty("mapreduce.jobtracker.address", "local");
@@ -210,7 +209,6 @@ public class CamusJobTest {
 
         try {
             for(FileStatus file : fs.listStatus(path)) {
-                System.out.println("Message Path = " + path.toString());
                 if(file.isDir()) {
                     messages.addAll(readMessages(file.getPath()));
                 }

@@ -389,16 +389,14 @@ public class CamusJob extends Configured implements Tool {
 
 			TaskCompletionEvent[] tasks = job.getTaskCompletionEvents(0);
 
-            for (TaskReport taskReport : client.getMapTaskReports(tasks[0].getTaskAttemptId().getJobID())) {
-                log.info(String.format("TaskId: %s exited with status %s", taskReport.getTaskID().toString(),
-                        taskReport.getCurrentStatus()));
-                if (taskReport.getCurrentStatus().equals(TIPStatus.FAILED)) {
-                    for (String s : taskReport.getDiagnostics()) {
-                        log.error("task error: " + s);
-                    }
-                }
-            }
-
+			for (TaskReport task : client.getMapTaskReports(tasks[0]
+					.getTaskAttemptId().getJobID())) {
+				if (task.getCurrentStatus().equals(TIPStatus.FAILED)) {
+					for (String s : task.getDiagnostics()) {
+						System.err.println("task error: " + s);
+					}
+				}
+			}
 			throw new RuntimeException("hadoop job failed");
 		}
 
@@ -693,14 +691,8 @@ public class CamusJob extends Configured implements Tool {
 
 		props.putAll(cmd.getOptionProperties("D"));
 
-        try {
-            run();
-            log.info("Exiting successful Camus run.");
-            return 0;
-        } catch(Exception ex) {
-            log.error("Camus run failed with unexpected exception:", ex);
-            return 1;
-        }
+		run();
+		return 0;
 	}
 
 	// Temporarily adding all Kafka parameters here
