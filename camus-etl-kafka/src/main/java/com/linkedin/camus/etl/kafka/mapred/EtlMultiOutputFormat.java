@@ -203,6 +203,10 @@ public class EtlMultiOutputFormat extends FileOutputFormat<EtlKey, Object> {
     return partitionersByTopic.get(topicName);
   }
 
+  public static Map<String, Partitioner> getPartitioners() {
+    return partitionersByTopic;
+  }
+
   public static void resetPartitioners() {
     partitionersByTopic = new HashMap<String, Partitioner>();
   }
