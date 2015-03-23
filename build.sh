@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 VERSION=0.1.2
 if [ -z "$BUILD_NUMBER" ]; then
@@ -63,7 +63,7 @@ mvn deploy:deploy-file -DgroupId=org.apache.avro -DartifactId=avro-repo-bundle -
 
 # --- Build Hadoop 1 ---
 # update pom files
-set-version $VERSION-hadoop1$SNAPHOT
+set-version $VERSION-hadoop1$SNAPSHOT
 mvn -DaltDeploymentRepository=internal.repo::default::file://$(pwd)/target/mvn-repo clean deploy
 find . -name "pom.xml" | xargs git checkout 
 
