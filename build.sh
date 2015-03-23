@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-VERSION=0.1.1
+VERSION=0.1.2
+if [ -z "$BUILD_NUMBER" ]; then
+	SNAPSHOT="-SNAPSHOT"	
+fi
 
 while [ "$#" -gt 0 ]; do
   case "$1" in 
@@ -60,13 +63,13 @@ mvn deploy:deploy-file -DgroupId=org.apache.avro -DartifactId=avro-repo-bundle -
 
 # --- Build Hadoop 1 ---
 # update pom files
-set-version $VERSION-hadoop1
+set-version $VERSION-hadoop1$SNAPHOT
 mvn -DaltDeploymentRepository=internal.repo::default::file://$(pwd)/target/mvn-repo clean deploy
 find . -name "pom.xml" | xargs git checkout 
 
 # --- Build Cloudera ---
 # update pom files
-set-version $VERSION-cdh4
+set-version $VERSION-cdh4$SNAPSHOT
 mvn -Dhadoop-client.version=2.0.0-mr1-cdh4.2.0 -DaltDeploymentRepository=internal.repo::default::file://$(pwd)/target/mvn-repo clean deploy
 find . -name "pom.xml" | xargs git checkout 
 
